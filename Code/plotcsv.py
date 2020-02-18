@@ -57,9 +57,8 @@ def files():
     save = input('Save fig? [y/n]: ')
     if save == 'y':
         pathlist = path.split('/')
-        savename = '_'.join(pathlist[-2:])+'.png'
-        saveloc = os.path.join('/'.join(pathlist[:-3]),'Figures')
-        print(os.path.join(saveloc,savename))
+        savename = '_'.join(pathlist[-3:])+'.png'
+        saveloc = os.path.join('/'.join(pathlist[:-4]),'Figures')
         plt.savefig(os.path.join(saveloc,savename))
 
         # plt.savefig(os)
