@@ -52,6 +52,8 @@ def files():
         value.append(v)
         i+=1
     plt.legend()
+    plt.xlabel("epoch")
+    plt.ylabel("Loss")
     plt.grid()
     # plt.show(block = False)
     save = input('Save fig? [y/n]: ')
