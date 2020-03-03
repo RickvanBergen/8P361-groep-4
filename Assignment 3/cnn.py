@@ -6,7 +6,6 @@ Author: Suzanne Wetstein
 
 import os
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 from keras.preprocessing.image import ImageDataGenerator
@@ -86,6 +85,7 @@ weights_filepath = model_name + '_weights.hdf5'
 model_json = model.to_json()  # serialize model to JSON
 with open(model_filepath, 'w') as json_file:
     json_file.write(model_json)
+    model.save_weights(weights_filepath)
 
 
 # define the model checkpoint and Tensorboard callbacks
@@ -104,14 +104,14 @@ history = model.fit_generator(train_gen, steps_per_epoch=train_steps,
                     epochs=3,
                     callbacks=callbacks_list)
 
+
 # ROC analysis
 true_labels = val_gen.classes
 val_gen.reset()
 
 predict = model.predict_generator(val_gen, steps=val_steps, verbose=1)
-predicted = np.round(predict)
 
-fpr, tpr, thresholds = roc_curve(true_labels, predicted)
+fpr, tpr, thresholds = roc_curve(true_labels, predict)
 roc_auc = auc(fpr, tpr)
 
 plt.figure()

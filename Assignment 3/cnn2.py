@@ -6,13 +6,11 @@ Author: Suzanne Wetstein
 
 import os
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Reshape
-from keras.layers import Conv2D, MaxPool2D
+from keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling2D
 from keras.optimizers import SGD
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from sklearn.metrics import roc_curve, auc
@@ -46,7 +44,7 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
      return train_gen, val_gen
 
 
-def get_model(kernel_size=(3, 3), pool_size=(4, 4), first_filters=32, second_filters=64):
+def get_model(kernel_size=(3, 3), pool_size=(4, 4), first_filters=32, second_filters=64, third_filters=128):
 
      # build the model
      model = Sequential()
@@ -58,8 +56,12 @@ def get_model(kernel_size=(3, 3), pool_size=(4, 4), first_filters=32, second_fil
      model.add(Conv2D(second_filters, kernel_size, activation='relu', padding='same'))
      model.add(MaxPool2D(pool_size=pool_size))
 
-     model.add(Flatten())
-     model.add(Dense(1, activation='sigmoid'))
+     model.add(Conv2D(third_filters, kernel_size, activation='relu', padding='same'))
+     model.add(MaxPool2D(pool_size=pool_size))
+
+     model.add(Conv2D(1, kernel_size, activation='sigmoid', padding='same'))
+     model.add(GlobalAveragePooling2D())
+
 
 
      # compile the model
@@ -108,9 +110,8 @@ true_labels = val_gen.classes
 val_gen.reset()
 
 predict = model.predict_generator(val_gen, steps=val_steps, verbose=1)
-predicted = np.round(predict)
 
-fpr, tpr, _ = roc_curve(true_labels, predicted)
+fpr, tpr, _ = roc_curve(true_labels, predict)
 roc_auc = auc(fpr, tpr)
 
 plt.figure()
