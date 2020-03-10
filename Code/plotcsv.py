@@ -25,7 +25,7 @@ def readcsv(read_filename):
             value.append(val)
     #step correction
     step.pop()
-    step.append(10)
+    step.append(9)
     return walltime,step,value
     
 def files():
@@ -47,13 +47,13 @@ def files():
 
         #Rounding necessary because of a bug in plotting
         for val in range(len(v)):
-            v[val]=round(float(v[val]),10)
+            v[val]=round(float(v[val]),9)
         plt.plot(s,v,colours[i],label=file.split('-')[1])
         value.append(v)
         i+=1
     plt.legend()
     plt.xlabel("epoch")
-    plt.ylabel("Loss")
+    plt.ylabel("Accuracy")
     plt.grid()
     # plt.show(block = False)
     save = input('Save fig? [y/n]: ')
