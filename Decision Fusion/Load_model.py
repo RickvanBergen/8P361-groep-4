@@ -50,15 +50,18 @@ val_steps = val_gen.n//val_gen.batch_size
 
 val_gen.reset()
 
+pre_dict = dict()
 predict1 = model1.predict_generator(val_gen, steps=val_steps, verbose=1)
+pre_dict['predict1'] = predict1
 predict2 = model1.predict_generator(val_gen, steps=val_steps, verbose=1)
+pre_dict['predict2'] = predict2
+pre_dict['predict_mean'] = np.mean([predict1,predict2],axis=0)
+pre_dict['predict_min'] = np.minimum(predict1,predict2)
+pre_dict['predict_max'] = np.maximum(predict1,predict2)
 
-predict = np.mean([predict1,predict2],axis=0)
-
-for pr in [predict,predict1,predict2]:
-    fpr, tpr, thresholds = roc_curve(true_labels, pr)
+for pr in pre_dict.keys():
+    fpr, tpr, thresholds = roc_curve(true_labels, pre_dict[pr])
     roc_auc = auc(fpr, tpr)
-
     plt.figure()
     plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0,1], [0,1], color='navy', lw=2, linestyle='--')
@@ -68,4 +71,5 @@ for pr in [predict,predict1,predict2]:
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operator Characteristics')
     plt.legend(loc='lower right')
+    plt.title(pr)
 plt.show()
