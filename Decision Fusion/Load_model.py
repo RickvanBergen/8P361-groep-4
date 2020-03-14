@@ -11,6 +11,7 @@ from keras.callbacks import ModelCheckpoint, TensorBoard
 from sklearn.metrics import roc_curve, auc
 import time
 import os
+import pickle
 
 IMAGE_SIZE = 96
 
@@ -27,12 +28,14 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
     train_gen = datagen.flow_from_directory(train_path,
                                             target_size=(IMAGE_SIZE, IMAGE_SIZE),
                                             batch_size=train_batch_size,
-                                            class_mode='binary')
+                                            class_mode='binary',
+                                            shuffle=False)
 
     val_gen = datagen.flow_from_directory(valid_path,
                                           target_size=(IMAGE_SIZE, IMAGE_SIZE),
                                           batch_size=val_batch_size,
-                                          class_mode='binary', shuffle=False)
+                                          class_mode='binary',
+                                          shuffle=False)
 
     return train_gen, val_gen
 
@@ -46,7 +49,7 @@ model1.load_weights('models\model1_weights.hdf5')
 model2.load_weights('models\model2_weights.hdf5')
 model3.load_weights('models\\transfer_model_weights.hdf5')
 
-
+rf = pickle.load(open('models\RF_model.sav','rb'))
 
 train_gen, val_gen = get_pcam_generators(
     r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\\")
@@ -66,6 +69,11 @@ pre_dict['predict_mean'] = np.mean([predict1,predict2,predict_tran],axis=0)
 pre_dict['predict_min'] = np.minimum(predict1,predict2,predict_tran)
 pre_dict['predict_max'] = np.maximum(predict1,predict2,predict_tran)
 
+pred_matrix = np.concatenate((predict1,predict2,predict_tran),axis=1)
+pre_rf = rf.predict(pred_matrix)
+pre_dict['RF'] = pre_rf#[:,1]
+score = rf.score(pred_matrix,true_labels)
+print(score)
 for pr in pre_dict.keys():
     fpr, tpr, thresholds = roc_curve(true_labels, pre_dict[pr])
     roc_auc = auc(fpr, tpr)
