@@ -9,11 +9,10 @@ import os
 import matplotlib.pyplot as plt
 
 from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential, Model
-from keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling2D, Dropout, Input, Dense
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling2D, Dropout, Input, Dense, Flatten, BatchNormalization
 from keras.optimizers import SGD
-from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
+from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 from sklearn.metrics import roc_curve, auc
 
 
@@ -45,32 +44,20 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
      return train_gen, val_gen
 
 
-def get_model(kernel_size=(3, 3), pool_size=(4, 4), first_filters=32, second_filters=64, third_filters=128):
+def get_model():
 
      # build the model
-     input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)
-     input = Input(input_shape)
-
-     pretrained = MobileNetV2(input_shape=input_shape, include_top=False, weights=None, pooling=None)
-
-     output = pretrained(input)
-     # output = GlobalAveragePooling2D()(output)
-     # output = Dropout(0.5)(output)
-     # output = Dense(32, activation='sigmoid')(output)
-     output = Conv2D(first_filters, kernel_size, activation='relu', padding='same',
-                      input_shape=input_shape)(output)
-     # output = MaxPool2D(pool_size=pool_size)(output)
-     output = Conv2D(second_filters, kernel_size, activation='relu', padding='same',
-                     input_shape=input_shape)(output)
-     # output = MaxPool2D(pool_size=pool_size)(output)
-     output = Conv2D(third_filters, kernel_size, activation='relu', padding='same',
-                     input_shape=input_shape)(output)
-     # output = MaxPool2D(pool_size=pool_size)(output)
-     output = Conv2D(1, kernel_size, activation='sigmoid', padding='same')(output)
-     output = GlobalAveragePooling2D()(output)
-
-     model = Model(inputs=input, outputs=output)
-
+     model = Sequential()
+     model.add(Conv2D(32, kernel_size=(3,3), activation='relu', padding='same',
+                      input_shape=(IMAGE_SIZE, IMAGE_SIZE, 3)))
+     model.add(MaxPool2D(pool_size=(4,4)))
+     model.add(Conv2D(64, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(Conv2D(64, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(MaxPool2D(pool_size=(4,4)))
+     model.add(Conv2D(128, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(Flatten())
+     model.add(Dense(32, activation='relu'))
+     model.add(Dense(1, activation='sigmoid'))
      # compile the model
      model.compile(SGD(lr=0.01, momentum=0.95), loss='binary_crossentropy', metrics=['accuracy'])
 
@@ -99,7 +86,8 @@ with open(model_filepath, 'w') as json_file:
 # define the model checkpoint and Tensorboard callbacks
 checkpoint = ModelCheckpoint(weights_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 tensorboard = TensorBoard(os.path.join('logs', model_name))
-callbacks_list = [checkpoint, tensorboard]
+earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=1, mode='min', restore_best_weights=False)
+callbacks_list = [checkpoint, tensorboard, earlystopping]
 
 
 # train the model
@@ -109,7 +97,7 @@ val_steps = val_gen.n//val_gen.batch_size
 history = model.fit_generator(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
-                    epochs=3,
+                    epochs=100,
                     callbacks=callbacks_list)
 
 # ROC analysis
