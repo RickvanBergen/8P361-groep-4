@@ -11,11 +11,12 @@ from keras.callbacks import ModelCheckpoint, TensorBoard
 from sklearn.metrics import roc_curve, auc
 import time
 import os
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import accuracy_score
 import pickle
+import Util as ut
 
 
 IMAGE_SIZE = 96
@@ -42,15 +43,9 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
     return train_gen, val_gen
 
-with open('models\model1.json', 'r') as f:
-    model1 = model_from_json(f.read())
-with open('models\model2.json', 'r') as f:
-    model2 = model_from_json(f.read())
-with open('models\\transfer_model.json', 'r') as f:
-    model3 = model_from_json(f.read())
-model1.load_weights('models\model1_weights.hdf5')
-model2.load_weights('models\model2_weights.hdf5')
-model3.load_weights('models\\transfer_model_weights.hdf5')
+# model1 = ut.load_pr_model('model1')
+# model2 = ut.load_pr_model('model2')
+# model3 = ut.load_pr_model('transfer_model')
 
 
 
@@ -61,13 +56,34 @@ train_steps = train_gen.n//train_gen.batch_size
 
 train_gen.reset()
 
-predict1 = model1.predict_generator(train_gen, steps=train_steps, verbose=1)
-predict2 = model2.predict_generator(train_gen, steps=train_steps, verbose=1)
-predict3 = model3.predict_generator(train_gen, steps=train_steps, verbose=1)
+predict1 = np.expand_dims(np.loadtxt('Predictions//model1.csv', delimiter=','),axis=1)
+predict2 = np.expand_dims(np.loadtxt('Predictions//model2.csv', delimiter=','),axis=1)
+predict3 = np.expand_dims(np.loadtxt('Predictions//transfer_model.csv', delimiter=','),axis=1)
+predict4 = np.expand_dims(np.loadtxt('Predictions//4_Model_2+conv(128).csv', delimiter=','),axis=1)
+predict5 = np.expand_dims(np.loadtxt('Predictions//13_Model_12+lr(0.001).csv', delimiter=','),axis=1)
+predict98 = np.expand_dims(np.loadtxt('Predictions//Model31.csv', delimiter=','),axis=1)
 
-train_pred = np.concatenate((predict1,predict2,predict3),axis=1)
+# predict1 = model1.predict_generator(train_gen, steps=train_steps, verbose=1)
+# predict2 = model2.predict_generator(train_gen, steps=train_steps, verbose=1)
+# predict3 = model3.predict_generator(train_gen, steps=train_steps, verbose=1)
 
-RF_model = RandomForestClassifier(n_estimators=100)
+train_pred = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
+
+RF_model = RandomForestRegressor(n_estimators=500, verbose=1, max_depth=10)
 RF_model.fit(train_pred,true_labels)
-modelname = 'models\RF_model.sav'
+modelname = 'models\\Combination_mod\\RF_model_reg_restr_500_10_5in.sav'
 pickle.dump(RF_model, open(modelname,'wb'))
+
+fpr, tpr, thresholds = roc_curve(true_labels, RF_model.predict(train_pred))
+roc_auc = auc(fpr, tpr)
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0,1], [0,1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operator Characteristics')
+plt.legend(loc='lower right')
+plt.title('rf')
+plt.show()
