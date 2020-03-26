@@ -49,7 +49,7 @@ val_gen.reset()
 def predict_train(model_name):
     model = ut.load_pr_model(model_name)
     predict = model.predict_generator(train_gen, steps=train_steps, verbose=1)
-    np.savetxt(os.path.join('Predictions', model_name+'.csv'), predict, delimiter=',')
+    np.savetxt(os.path.join('Main model//Predictions', model_name+'.csv'), predict, delimiter=',')
 
-
-predict_train('transfer_model')
+predict_train('model16')
+predict_train('transfer_MobileNetV2')

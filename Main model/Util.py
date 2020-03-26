@@ -4,21 +4,21 @@ from keras.callbacks import ModelCheckpoint, TensorBoard
 
 
 def load_pr_model(name):
-    path = os.path.join('models','Prediction_mod',name)
+    path = os.path.join('Main model','models','Prediction_mod',name)
     with open(path + '.json', 'r') as f:
         model = model_from_json(f.read())
     model.load_weights(path + '_weights.hdf5')
     return model
 
 def load_com_model(name):
-    path = os.path.join('models','Combination_mod',name)
+    path = os.path.join('Main model','models','Combination_mod',name)
     with open(path + '.json', 'r') as f:
         model = model_from_json(f.read())
     model.load_weights(path + '_weights.hdf5')
     return model
 
 def save_com_model(name,model):
-    model_name = os.path.join('models\Combination_mod',name)
+    model_name = os.path.join('Main model','models','Combination_mod',name)
     model_filepath = model_name + '.json'
     weights_filepath = model_name + '_weights.hdf5'
 
