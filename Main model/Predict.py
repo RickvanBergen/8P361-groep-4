@@ -51,5 +51,6 @@ def predict_train(model_name):
     predict = model.predict_generator(train_gen, steps=train_steps, verbose=1)
     np.savetxt(os.path.join('Main model//Predictions', model_name+'.csv'), predict, delimiter=',')
 
-predict_train('model16')
-predict_train('transfer_MobileNetV2')
+predict_train('model13_1')
+predict_train('model_28')
+predict_train('model_30')

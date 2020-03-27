@@ -40,10 +40,13 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
     return train_gen, val_gen
 
 model1 = ut.load_pr_model('model13')
+model1_1 = ut.load_pr_model('model13_1')
 model2 = ut.load_pr_model('model31')
 model3 = ut.load_pr_model('model26')
 model4 = ut.load_pr_model('model16')
 model5 = ut.load_pr_model('transfer_MobileNetV2')
+model6 = ut.load_pr_model('model_28')
+model7 = ut.load_pr_model('model_30')
 # model4 = ut.load_pr_model('4_Model_2+conv(128)')
 # model5 = ut.load_pr_model('13_Model_12+lr(0.001)')
 # model_comb = ut.load_com_model('modelcombi')
@@ -75,6 +78,8 @@ val_gen.reset()
 pre_dict = dict()
 predict1 = model1.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['predict1'] = predict1
+predict1_1 = model1_1.predict_generator(val_gen, steps=val_steps, verbose=1)
+pre_dict['predict1_1'] = predict1_1
 predict2 = model2.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['predict2'] = predict2
 predict3 = model3.predict_generator(val_gen, steps=val_steps, verbose=1)
@@ -83,6 +88,10 @@ predict4 = model4.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['predict4'] = predict4
 predict5 = model5.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['transfer MobileNetV2'] = predict5
+predict6 = model6.predict_generator(val_gen, steps=val_steps, verbose=1)
+pre_dict['predict6'] = predict6
+predict7 = model7.predict_generator(val_gen, steps=val_steps, verbose=1)
+pre_dict['predict7'] = predict7
 # predict4 = model4.predict_generator(val_gen, steps=val_steps,verbose=1)
 # pre_dict['predict4'] = predict4
 
@@ -91,6 +100,7 @@ pre_dict['transfer MobileNetV2'] = predict5
 
 pre_dict['predict_mean'] = np.mean([predict1,predict2,predict3],axis=0)
 pre_dict['predict mean 5'] = np.mean([predict1,predict2,predict3,predict4,predict5],axis=0)
+pre_dict['predict mean 8'] = np.mean([predict1,predict1_1,predict2,predict3,predict4,predict5,predict6,predict7],axis=0)
 pre_dict['predict_min'] = np.minimum(predict1,predict2,predict3)
 pre_dict['predict_max'] = np.maximum(predict1,predict2,predict3)
 #
@@ -113,26 +123,26 @@ pred_matrix = np.concatenate((predict1,predict2,predict3),axis=1)
 # pre_dict['RF5'] = pre_rf5
 
 
-pre_svc = svc.decision_function(pred_matrix)
-pre_dict['SVC'] = pre_svc
-pre_svc_100000 = svc100000.decision_function(pred_matrix)
-pre_dict['SVC iter=100000'] = pre_svc_100000
-pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
-pre_dict['SVC_rbf'] = pre_svc_rbf
-pre_svc_rbf_C100 = svc_rbf_C100.decision_function(pred_matrix)
-pre_dict['SVC_rbf_ C=100'] = pre_svc_rbf_C100
-pre_svc_rbf_C1000 = svc_rbf_C1000.decision_function(pred_matrix)
-pre_dict['SVC_rbf_ C=1000'] = pre_svc_rbf_C1000
-pre_svc_rbf_C01 = svc_rbf_C01.decision_function(pred_matrix)
-pre_dict['SVC_rbf_ C=0.1'] = pre_svc_rbf_C01
-pre_svc_rbf_C001 = svc_rbf_C001.decision_function(pred_matrix)
-pre_dict['SVC_rbf_ C=0.01'] = pre_svc_rbf_C001
-pre_svc_rbf_C00001 = svc_rbf_C00001.decision_function(pred_matrix)
-pre_dict['SVC_rbf_ C=0.0001'] = pre_svc_rbf_C00001
-pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
-pre_dict['SVC_poly2'] = pre_svc_poly2
-pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
-pre_dict['SVC_poly3'] = pre_svc_poly3
+# pre_svc = svc.decision_function(pred_matrix)
+# pre_dict['SVC'] = pre_svc
+# pre_svc_100000 = svc100000.decision_function(pred_matrix)
+# pre_dict['SVC iter=100000'] = pre_svc_100000
+# pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
+# pre_dict['SVC_rbf'] = pre_svc_rbf
+# pre_svc_rbf_C100 = svc_rbf_C100.decision_function(pred_matrix)
+# pre_dict['SVC_rbf_ C=100'] = pre_svc_rbf_C100
+# pre_svc_rbf_C1000 = svc_rbf_C1000.decision_function(pred_matrix)
+# pre_dict['SVC_rbf_ C=1000'] = pre_svc_rbf_C1000
+# pre_svc_rbf_C01 = svc_rbf_C01.decision_function(pred_matrix)
+# pre_dict['SVC_rbf_ C=0.1'] = pre_svc_rbf_C01
+# pre_svc_rbf_C001 = svc_rbf_C001.decision_function(pred_matrix)
+# pre_dict['SVC_rbf_ C=0.01'] = pre_svc_rbf_C001
+# pre_svc_rbf_C00001 = svc_rbf_C00001.decision_function(pred_matrix)
+# pre_dict['SVC_rbf_ C=0.0001'] = pre_svc_rbf_C00001
+# pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
+# pre_dict['SVC_poly2'] = pre_svc_poly2
+# pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
+# pre_dict['SVC_poly3'] = pre_svc_poly3
 
 # score = rf.score(pred_matrix,true_labels)
 for pr in pre_dict.keys():
