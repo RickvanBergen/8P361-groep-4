@@ -24,48 +24,69 @@ def readcsv(read_filename):
             step.append(stp)
             value.append(val)
     #step correction
-    step.pop()
-    step.append(9)
     return walltime,step,value
     
 def files():
     value=[]
-    colours=['r','g','b','k','y','m','c','orange','gray']
-    path = ut.folder_path()
-    files = os.listdir(path)
+    types=['-','--','*']
+    path_acc = ut.folder_path()
+    files_acc = os.listdir(path_acc)
+    path_loss = ut.folder_path()
+    files_loss = os.listdir(path_loss)
     i=0
-    for file in files:
+    for file in files_acc:
         # num=str(i+1)
         # file=input("Enter filename of CSV file "+num+ " with extension: ")
 
-        t,s,v= readcsv(os.path.join(path,file))
+        t,s,v= readcsv(os.path.join(path_acc,file))
 
         t=t[1:]
         s=s[1:]
         v=v[1:]
 
+        #Rounding necessary because of a bug in plotting
+        for val in range(len(v)):
+            v[val]=round(float(v[val]),9)
+        
+        label = file.split('-')[1]
+        plt.figure(1)
+        plt.plot(s,v,types[i]+'k',label=label)
+        value.append(v)
+        i+=1
+    plt.legend()
+    plt.xlabel("Step")
+    plt.ylabel("Accuracy")
+    plt.title(file.split('-')[0])
+    plt.grid() 
+    plt.show()
+    
+    i=0
+    for file in files_loss:
+        # num=str(i+1)
+        # file=input("Enter filename of CSV file "+num+ " with extension: ")
+
+        t,s,v= readcsv(os.path.join(path_loss,file))
+
+        t=t[1:]
+        s=s[1:]
+        v=v[1:]
 
         #Rounding necessary because of a bug in plotting
         for val in range(len(v)):
             v[val]=round(float(v[val]),9)
-        plt.plot(s,v,colours[i],label=file.split('-')[1])
+        
+        label = file.split('-')[1]
+        plt.figure(2)
+        plt.plot(s,v,types[i]+'k',label=label)
         value.append(v)
         i+=1
+    
     plt.legend()
-    plt.xlabel("epoch")
-    plt.ylabel("Accuracy")
-    plt.grid()
-    # plt.show(block = False)
-    save = input('Save fig? [y/n]: ')
-    if save == 'y':
-        pathlist = path.split('/')
-        savename = '_'.join(pathlist[-3:])+'.png'
-        saveloc = os.path.join('/'.join(pathlist[:-4]),'Figures')
-        plt.savefig(os.path.join(saveloc,savename))
-
-        # plt.savefig(os)
+    plt.xlabel("Step")
+    plt.ylabel("Loss")
+    plt.title(file.split('-')[0])
+    plt.grid() 
     plt.show()
 
-##Fill in number of files to be analysed (maximum of 7)
 files()
 ##
