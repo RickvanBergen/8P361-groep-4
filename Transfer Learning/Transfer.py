@@ -48,15 +48,42 @@ def get_model():
 
      # build the model
      model = Sequential()
-     model.add(Conv2D(32, kernel_size=(3,3), activation='relu', padding='same',
+     model.add(Conv2D(64, kernel_size=(3,3), activation='relu', padding='same',
                       input_shape=(IMAGE_SIZE, IMAGE_SIZE, 3)))
-     model.add(MaxPool2D(pool_size=(4,4)))
+     model.add(BatchNormalization())
      model.add(Conv2D(64, kernel_size=(3,3), activation='relu', padding='same'))
-     model.add(Conv2D(64, kernel_size=(3,3), activation='relu', padding='same'))
-     model.add(MaxPool2D(pool_size=(4,4)))
+     model.add(BatchNormalization())
+     model.add(MaxPool2D(pool_size=(2,2)))
+     
      model.add(Conv2D(128, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(Conv2D(128, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(MaxPool2D(pool_size=(2,2)))
+     
+     model.add(Conv2D(256, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(Conv2D(256, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(MaxPool2D(pool_size=(2,2)))
+     
+     model.add(Conv2D(512, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(Conv2D(512, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(MaxPool2D(pool_size=(2,2)))
+     
+     model.add(Conv2D(512, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(Conv2D(512, kernel_size=(3,3), activation='relu', padding='same'))
+     model.add(BatchNormalization())
+     model.add(MaxPool2D(pool_size=(2,2)))
+     
      model.add(Flatten())
-     model.add(Dense(32, activation='relu'))
+     model.add(Dense(512, activation='relu'))
+     model.add(BatchNormalization())
+     model.add(Dense(512, activation='relu'))
+     model.add(BatchNormalization())
      model.add(Dense(1, activation='sigmoid'))
      # compile the model
      model.compile(SGD(lr=0.01, momentum=0.95), loss='binary_crossentropy', metrics=['accuracy'])
@@ -74,7 +101,7 @@ train_gen, val_gen = get_pcam_generators(
 
 
 # save the model and weights
-model_name = 'TransferLearning_test'
+model_name = 'model_28'
 model_filepath = model_name + '.json'
 weights_filepath = model_name + '_weights.hdf5'
 
@@ -86,7 +113,7 @@ with open(model_filepath, 'w') as json_file:
 # define the model checkpoint and Tensorboard callbacks
 checkpoint = ModelCheckpoint(weights_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 tensorboard = TensorBoard(os.path.join('logs', model_name))
-earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=1, mode='min', restore_best_weights=False)
+earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1, mode='min', restore_best_weights=False)
 callbacks_list = [checkpoint, tensorboard, earlystopping]
 
 
