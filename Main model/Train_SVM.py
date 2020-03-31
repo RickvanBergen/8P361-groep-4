@@ -59,8 +59,9 @@ train_steps = train_gen.n//train_gen.batch_size
 # predict1 = model1.predict_generator(train_gen, steps=train_steps, verbose=1)
 # predict2 = model2.predict_generator(train_gen, steps=train_steps, verbose=1)
 # predict3 = model3.predict_generator(train_gen, steps=train_steps, verbose=1)
+
 predict1 = np.expand_dims(np.loadtxt('Main model//Predictions//model13_1.csv', delimiter=','),axis=1)
-predict2 = np.expand_dims(np.loadtxt('Main_model//Predictions//model21.csv', delimiter=','),axis=1)
+predict2 = np.expand_dims(np.loadtxt('Main model//Predictions//model21.csv', delimiter=','),axis=1)
 predict3 = np.expand_dims(np.loadtxt('Main model//Predictions//model16.csv', delimiter=','),axis=1)
 predict4 = np.expand_dims(np.loadtxt('Main model//Predictions//model26.csv', delimiter=','),axis=1)
 predict5 = np.expand_dims(np.loadtxt('Main model//Predictions//model28.csv', delimiter=','),axis=1)
@@ -70,35 +71,40 @@ predict5 = np.expand_dims(np.loadtxt('Main model//Predictions//model28.csv', del
 # predict98 = np.expand_dims(np.loadtxt('Predictions//Model31.csv', delimiter=','),axis=1)
 
 
-train_pred3 = np.concatenate((predict1,predict2,predict3),axis=1)
+train_pred = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
 
 
 # SVM_model = svm.SVC(kernel='linear',C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
-# SVM_model.fit(train_pred3,true_labels)
-# modelname = 'Main model\\models\Combination_mod\\SVC.sav'
+# SVM_model.fit(train_pred,true_labels)
+# modelname = 'Main model\\models\Combination_mod\\SVC_lin.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
 #
 # SVM_model = svm.SVC(kernel='linear',C=1, verbose=1, gamma='scale', max_iter=100000, probability=True)
-# SVM_model.fit(train_pred3,true_labels)
-# modelname = 'Main model\\models\Combination_mod\\SVC_iter=100000.sav'
+# SVM_model.fit(train_pred,true_labels)
+# modelname = 'Main model\\models\Combination_mod\\SVC_lin_iter=100000.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
-
-
-SVM_model = svm.SVC(kernel='rbf',C=0.0001, verbose=1, gamma='scale', max_iter=10000, probability=True)
-SVM_model.fit(train_pred3,true_labels)
-modelname = 'Main model\\models\Combination_mod\\SVC_rbf_C=0.0001.sav'
-pickle.dump(SVM_model, open(modelname,'wb'))
+#
+# SVM_model = svm.SVC(kernel='rbf',C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
+# SVM_model.fit(train_pred,true_labels)
+# modelname = 'Main model\\models\Combination_mod\\SVC_rbf.sav'
+# pickle.dump(SVM_model, open(modelname,'wb'))
+#
 # SVM_model = svm.SVC(kernel='poly', degree = 2, C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
-# SVM_model.fit(train_pred3,true_labels)
+# SVM_model.fit(train_pred,true_labels)
 # modelname = 'Main model\\models\Combination_mod\\SVC_poly=2.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
 #
 # SVM_model = svm.SVC(kernel='poly', degree = 3, C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
-# SVM_model.fit(train_pred3,true_labels)
+# SVM_model.fit(train_pred,true_labels)
 # modelname = 'Main model\\models\Combination_mod\\SVC_poly=3.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
 
-# SVM_model = svm.SVC(kernel='poly', degree=5 ,C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
-# SVM_model.fit(train_pred3,true_labels)
-# modelname = 'models\Combination_mod\\SVC_poly5.sav'
+# SVM_model = svm.SVC(kernel='poly', degree=5, C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
+# SVM_model.fit(train_pred,true_labels)
+# modelname = 'Main model\\models\Combination_mod\\SVC_poly=5.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
+
+SVM_model = svm.SVC(kernel='poly', degree=5, C=0.0001, verbose=1, gamma='scale', max_iter=100000, probability=True)
+SVM_model.fit(train_pred,true_labels)
+modelname = 'Main model\\models\Combination_mod\\SVC_poly=5_C=00001_maxiter100000.sav'
+pickle.dump(SVM_model, open(modelname,'wb'))

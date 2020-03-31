@@ -39,25 +39,23 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
     return train_gen, val_gen
 
-model1_1 = ut.load_pr_model('model13_1')
+model1 = ut.load_pr_model('model13_1')
 model2 = ut.load_pr_model('model16')
 model3 = ut.load_pr_model('model21')
 model4 = ut.load_pr_model('model26')
-model5 = ut.load_pr_model('model28')
+model5 = ut.load_pr_model('model_28')
 
 # rf = pickle.load(open('models\Combination_mod\RF_model_reg_restr_500_10_2.sav','rb'))
 # rf5 = pickle.load(open('models\Combination_mod\RF_model_reg_restr_500_10_5in.sav','rb'))
 
 # svc = pickle.load(open('Main model\models\Combination_mod\SVC.sav','rb'))
-# svc100000 = pickle.load(open('Main model\models\Combination_mod\SVC_iter=100000.sav','rb'))
-# svc_rbf = pickle.load(open('Main model\models\Combination_mod\SVC_rbf.sav','rb'))
-# svc_rbf_C100 = pickle.load(open('Main model\models\Combination_mod\SVC_rbf_C=100.sav','rb'))
-# svc_rbf_C1000 = pickle.load(open('Main model\models\Combination_mod\SVC_rbf_C=1000.sav','rb'))
-# svc_rbf_C01 = pickle.load(open('Main model\models\Combination_mod\SVC_rbf_C=0.1.sav','rb'))
-# svc_rbf_C001 = pickle.load(open('Main model\models\Combination_mod\SVC_rbf_C=0.01.sav','rb'))
-# svc_rbf_C00001 = pickle.load(open('Main model\models\Combination_mod\SVC_rbf_C=0.01.sav','rb'))
-# svc_poly2 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=2.sav','rb'))
-# svc_poly3 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=3.sav','rb'))
+svc_lin = pickle.load(open('Main model\models\Combination_mod\SVC_lin.sav','rb'))
+svc100000 = pickle.load(open('Main model\models\Combination_mod\SVC_lin_iter=100000.sav','rb'))
+svc_rbf = pickle.load(open('Main model\models\Combination_mod\SVC_rbf.sav','rb'))
+svc_poly2 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=2.sav','rb'))
+svc_poly3 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=3.sav','rb'))
+svc_poly5 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=5.sav','rb'))
+svc_poly5_c0001 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=5_C=0001.sav','rb'))
 
 # svm10 = pickle.load(open('models\Combination_mod\SVM_C=10.sav','rb'))
 # nusvm = pickle.load(open('models\Combination_mod\\NuSVM.sav','rb'))
@@ -70,10 +68,9 @@ true_labels = val_gen.classes
 val_steps = val_gen.n//val_gen.batch_size
 val_gen.reset()
 pre_dict = dict()
+
 predict1 = model1.predict_generator(val_gen, steps=val_steps, verbose=1)
-pre_dict['predict1'] = predict1
-predict1_1 = model1_1.predict_generator(val_gen, steps=val_steps, verbose=1)
-pre_dict['predict1_1'] = predict1_1
+pre_dict['predict1_1'] = predict1
 predict2 = model2.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['predict2'] = predict2
 predict3 = model3.predict_generator(val_gen, steps=val_steps, verbose=1)
@@ -81,29 +78,21 @@ pre_dict['predict3'] = predict3
 predict4 = model4.predict_generator(val_gen, steps=val_steps, verbose=1)
 pre_dict['predict4'] = predict4
 predict5 = model5.predict_generator(val_gen, steps=val_steps, verbose=1)
-pre_dict['transfer MobileNetV2'] = predict5
-predict6 = model6.predict_generator(val_gen, steps=val_steps, verbose=1)
-pre_dict['predict6'] = predict6
-predict7 = model7.predict_generator(val_gen, steps=val_steps, verbose=1)
-pre_dict['predict7'] = predict7
-# predict4 = model4.predict_generator(val_gen, steps=val_steps,verbose=1)
-# pre_dict['predict4'] = predict4
+pre_dict['predict5'] = predict5
+
 
 # predict5 = model4.predict_generator(val_gen, steps=val_steps,verbose=1)
 # pre_dict['predict5'] = predict5
 
-pre_dict['predict_mean'] = np.mean([predict1,predict2,predict3],axis=0)
 pre_dict['predict mean 5'] = np.mean([predict1,predict2,predict3,predict4,predict5],axis=0)
-pre_dict['predict mean 8'] = np.mean([predict1,predict1_1,predict2,predict3,predict4,predict5,predict6,predict7],axis=0)
-pre_dict['predict_min'] = np.minimum(predict1,predict2,predict3)
-pre_dict['predict_max'] = np.maximum(predict1,predict2,predict3)
+# pre_dict['predict_min'] = np.minimum(predict1,predict2,predict3,predict4,predict5)
+# pre_dict['predict_max'] = np.maximum(predict1,predict2,predict3,predict4,predict5)
 #
 # pre_dict['predict_mean5'] = np.mean([predict1,predict2,predict_tran,predict4,predict5],axis=0)
 # pre_dict['predict_min5'] = np.argmin([predict1,predict2,predict_tran,predict4,predict5],axis=1)
 # pre_dict['predict_max5'] = np.argmax([predict1,predict2,predict_tran,predict4,predict5],axis=1)
 
-pred_matrix = np.concatenate((predict1,predict2,predict3),axis=1)
-# pred_matrix5 = np.concatenate((predict1,predict2,predict_tran,predict4,predict5),axis=1)
+pred_matrix = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
 
 # print(pred_matrix.shape)
 # print('type predmatrix',type(pred_matrix))
@@ -119,24 +108,20 @@ pred_matrix = np.concatenate((predict1,predict2,predict3),axis=1)
 
 # pre_svc = svc.decision_function(pred_matrix)
 # pre_dict['SVC'] = pre_svc
-# pre_svc_100000 = svc100000.decision_function(pred_matrix)
-# pre_dict['SVC iter=100000'] = pre_svc_100000
-# pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
-# pre_dict['SVC_rbf'] = pre_svc_rbf
-# pre_svc_rbf_C100 = svc_rbf_C100.decision_function(pred_matrix)
-# pre_dict['SVC_rbf_ C=100'] = pre_svc_rbf_C100
-# pre_svc_rbf_C1000 = svc_rbf_C1000.decision_function(pred_matrix)
-# pre_dict['SVC_rbf_ C=1000'] = pre_svc_rbf_C1000
-# pre_svc_rbf_C01 = svc_rbf_C01.decision_function(pred_matrix)
-# pre_dict['SVC_rbf_ C=0.1'] = pre_svc_rbf_C01
-# pre_svc_rbf_C001 = svc_rbf_C001.decision_function(pred_matrix)
-# pre_dict['SVC_rbf_ C=0.01'] = pre_svc_rbf_C001
-# pre_svc_rbf_C00001 = svc_rbf_C00001.decision_function(pred_matrix)
-# pre_dict['SVC_rbf_ C=0.0001'] = pre_svc_rbf_C00001
-# pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
-# pre_dict['SVC_poly2'] = pre_svc_poly2
-# pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
-# pre_dict['SVC_poly3'] = pre_svc_poly3
+pre_svc_lin = svc_lin.decision_function(pred_matrix)
+pre_dict['SVC lin'] = pre_svc_lin
+pre_svc_100000 = svc100000.decision_function(pred_matrix)
+pre_dict['SVC iter=100000'] = pre_svc_100000
+pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
+pre_dict['SVC_rbf'] = pre_svc_rbf
+pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
+pre_dict['SVC_poly2'] = pre_svc_poly2
+pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
+pre_dict['SVC_poly3'] = pre_svc_poly3
+pre_svc_poly5 = svc_poly5.decision_function(pred_matrix)
+pre_dict['SVC_poly5'] = pre_svc_poly5
+pre_svc_poly5_C0001 = svc_poly5_c0001.decision_function(pred_matrix)
+pre_dict['SVC_poly5_C=0.001'] = pre_svc_poly5_C0001
 
 # score = rf.score(pred_matrix,true_labels)
 for pr in pre_dict.keys():
