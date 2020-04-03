@@ -15,6 +15,7 @@ import pickle
 import Util as ut
 IMAGE_SIZE = 96
 
+# create data generator
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
     # dataset parameters
     train_path = os.path.join(base_dir, 'train+val', 'train')
@@ -39,13 +40,14 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
     return train_gen, val_gen
 
-# load premade 
+# load premade predictions
 model1 = ut.load_pr_model('model13_1')
 model2 = ut.load_pr_model('model16')
 model3 = ut.load_pr_model('model21')
 model4 = ut.load_pr_model('model26')
 model5 = ut.load_pr_model('model_28')
 
+# load trained models random forest models
 rf = pickle.load(open('Main model\models\Combination_mod\RF_model.sav','rb'))
 rfc = pickle.load(open('Main model\models\Combination_mod\RFc.sav','rb'))
 rfc_d2 = pickle.load(open('Main model\models\Combination_mod\RFc_d=2.sav','rb'))
@@ -54,8 +56,7 @@ rfc_d3 = pickle.load(open('Main model\models\Combination_mod\RFc_d=3.sav','rb'))
 rfc_d10 = pickle.load(open('Main model\models\Combination_mod\RFc_d=10.sav','rb'))
 rfc_d20 = pickle.load(open('Main model\models\Combination_mod\RFc_d=20.sav','rb'))
 
-# svc = pickle.load(open('Main model\models\Combination_mod\SVC.sav','rb'))
-
+# load trained SVC models
 svc_lin = pickle.load(open('Main model\models\Combination_mod\SVC_lin.sav','rb'))
 svc_lin_C0001 = pickle.load(open('Main model\models\Combination_mod\SVC_lin_C=0.001.sav','rb'))
 svc_lin_C1000 = pickle.load(open('Main model\models\Combination_mod\SVC_lin_C=1000.sav','rb'))
@@ -68,9 +69,14 @@ svc_poly5 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=5.sav',
 svc_poly5_c0001 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=5_C=0001.sav','rb'))
 svc_poly5_c0001_100000 = pickle.load(open('Main model\models\Combination_mod\SVC_poly=5_C=00001_maxiter100000.sav','rb'))
 
+# generate data
 train_gen, val_gen = get_pcam_generators(
     r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\\")
+
+# create dictionary for plotting
 pre_dict = dict()
+
+# make switch between training an validation 0=validation and 1=training
 valtrain_switch = 1
 if valtrain_switch ==0:
     true_labels = val_gen.classes
@@ -99,35 +105,37 @@ elif valtrain_switch==1:
     pre_dict['predict4'] = predict4
     pre_dict['predict5'] = predict5
 
+# create matrix for input machine learning methods
 pred_matrix = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
-# predict5 = model4.predict_generator(val_gen, steps=val_steps,verbose=1)
-# pre_dict['predict5'] = predict5
 
+# make ensemble using the basic operators
 pre_dict['predict mean 5'] = np.mean([predict1,predict2,predict3,predict4,predict5],axis=0)
 pre_dict['predict_min'] = pred_matrix.min(axis=1)
 pre_dict['predict_max'] = pred_matrix.max(axis=1)
 
+# predict using the preloaded SVC models
 pre_svc_lin_C0001 = svc_lin_C0001.decision_function(pred_matrix)
 pre_dict['SVC lin C=0.001'] = pre_svc_lin_C0001
 pre_svc_lin_C1000 = svc_lin_C1000.decision_function(pred_matrix)
 pre_dict['SVC lin C=1000'] = pre_svc_lin_C1000
-# pre_svc_lin = svc_lin.decision_function(pred_matrix)
-# pre_dict['SVC lin'] = pre_svc_lin
-# pre_svc_100000 = svc100000.decision_function(pred_matrix)
-# pre_dict['SVC iter=100000'] = pre_svc_100000
-# pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
-# pre_dict['SVC_rbf'] = pre_svc_rbf
-# pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
-# pre_dict['SVC_poly2'] = pre_svc_poly2
-# pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
-# pre_dict['SVC_poly3'] = pre_svc_poly3
-# pre_svc_poly5 = svc_poly5.decision_function(pred_matrix)
-# pre_dict['SVC_poly5'] = pre_svc_poly5
-# pre_svc_poly5_C0001 = svc_poly5_c0001.decision_function(pred_matrix)
-# pre_dict['SVC_poly5_C=0.001'] = pre_svc_poly5_C0001
-# pre_svc_poly5_C0001_100000 =  svc_poly5_c0001_100000.decision_function(pred_matrix)
-# pre_dict['SVC_poly5_C=0.001,iter=100000'] = pre_svc_poly5_C0001_100000
+pre_svc_lin = svc_lin.decision_function(pred_matrix)
+pre_dict['SVC lin'] = pre_svc_lin
+pre_svc_100000 = svc100000.decision_function(pred_matrix)
+pre_dict['SVC iter=100000'] = pre_svc_100000
+pre_svc_rbf = svc_rbf.decision_function(pred_matrix)
+pre_dict['SVC_rbf'] = pre_svc_rbf
+pre_svc_poly2 = svc_poly2.decision_function(pred_matrix)
+pre_dict['SVC_poly2'] = pre_svc_poly2
+pre_svc_poly3 = svc_poly3.decision_function(pred_matrix)
+pre_dict['SVC_poly3'] = pre_svc_poly3
+pre_svc_poly5 = svc_poly5.decision_function(pred_matrix)
+pre_dict['SVC_poly5'] = pre_svc_poly5
+pre_svc_poly5_C0001 = svc_poly5_c0001.decision_function(pred_matrix)
+pre_dict['SVC_poly5_C=0.001'] = pre_svc_poly5_C0001
+pre_svc_poly5_C0001_100000 =  svc_poly5_c0001_100000.decision_function(pred_matrix)
+pre_dict['SVC_poly5_C=0.001,iter=100000'] = pre_svc_poly5_C0001_100000
 
+# predict using the preloaded Random Forest models
 pre_rf = rf.predict(pred_matrix)
 pre_dict['RF'] = pre_rf#[:,1]
 pre_rfc = rfc.predict_proba(pred_matrix)
@@ -142,9 +150,11 @@ pre_rfc_d10 = rfc_d10.predict_proba(pred_matrix)
 pre_dict['RFc d=10'] = pre_rfc_d10[:,1]
 pre_rfc_d20 = rfc_d20.predict_proba(pred_matrix)
 pre_dict['RFc d=20'] = pre_rfc_d20[:,1]
-# score = rf.score(pred_matrix,true_labels)
 
-pre_dict['hyper']= np.mean([pre_rfc_d5[:,1],pre_svc_lin_C0001],axis=0)
+# making model from mean from a Random Forest model and a SVC model
+pre_dict['mean RF and SVC']= np.mean([pre_rfc_d5[:,1],pre_svc_lin_C0001],axis=0)
+
+# creating ROC curves
 for pr in pre_dict.keys():
     fpr, tpr, thresholds = roc_curve(true_labels, pre_dict[pr])
     roc_auc = auc(fpr, tpr)

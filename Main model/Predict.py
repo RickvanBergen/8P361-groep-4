@@ -15,6 +15,7 @@ import pickle
 import Util as ut
 IMAGE_SIZE = 96
 
+# create generator
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
     # dataset parameters
     train_path = os.path.join(base_dir, 'train+val', 'train')
@@ -39,16 +40,19 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
     return train_gen, val_gen
 
-
+# generate data
 train_gen, val_gen = get_pcam_generators(
     r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\\")
 true_labels = val_gen.classes
 val_steps = val_gen.n // val_gen.batch_size
 train_steps = train_gen.n // train_gen.batch_size
 val_gen.reset()
+
+# Make function to predict models given a model name
 def predict_train(model_name):
     model = ut.load_pr_model(model_name)
     predict = model.predict_generator(train_gen, steps=train_steps, verbose=1)
     np.savetxt(os.path.join('Main model//Predictions', model_name+'.csv'), predict, delimiter=',')
 
+# example of making the predictions for a model
 predict_train('model21')
