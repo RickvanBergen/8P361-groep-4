@@ -21,6 +21,7 @@ import Util as ut
 
 IMAGE_SIZE = 96
 
+# create generatoor
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
     # dataset parameters
     train_path = os.path.join(base_dir, 'train+val', 'train')
@@ -43,26 +44,24 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
     return train_gen, val_gen
 
-# model1 = ut.load_pr_model('model1')
-# model2 = ut.load_pr_model('model2')
-# model3 = ut.load_pr_model('transfer_model')
-#
-#
-#
+# generate data
 train_gen, val_gen = get_pcam_generators(
     r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\\")
 true_labels = train_gen.classes
 train_steps = train_gen.n//train_gen.batch_size
 
+# load premade predictions
 predict1 = np.expand_dims(np.loadtxt('Main model//Predictions//model13_1.csv', delimiter=','),axis=1)
 predict2 = np.expand_dims(np.loadtxt('Main model//Predictions//model21.csv', delimiter=','),axis=1)
 predict3 = np.expand_dims(np.loadtxt('Main model//Predictions//model16.csv', delimiter=','),axis=1)
 predict4 = np.expand_dims(np.loadtxt('Main model//Predictions//model26.csv', delimiter=','),axis=1)
 predict5 = np.expand_dims(np.loadtxt('Main model//Predictions//model28.csv', delimiter=','),axis=1)
 
+# create training matrix
 train_pred = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
 
 
+## Creation, training and saving of several SVM models
 # SVM_model = svm.SVC(kernel='linear',C=1, verbose=1, gamma='scale', max_iter=10000, probability=True)
 # SVM_model.fit(train_pred,true_labels)
 # modelname = 'Main model\\models\Combination_mod\\SVC_lin.sav'
