@@ -53,23 +53,12 @@ train_gen, val_gen = get_pcam_generators(
     r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\\")
 true_labels = train_gen.classes
 train_steps = train_gen.n//train_gen.batch_size
-#
-# train_gen.reset()
-#
-# predict1 = model1.predict_generator(train_gen, steps=train_steps, verbose=1)
-# predict2 = model2.predict_generator(train_gen, steps=train_steps, verbose=1)
-# predict3 = model3.predict_generator(train_gen, steps=train_steps, verbose=1)
 
 predict1 = np.expand_dims(np.loadtxt('Main model//Predictions//model13_1.csv', delimiter=','),axis=1)
 predict2 = np.expand_dims(np.loadtxt('Main model//Predictions//model21.csv', delimiter=','),axis=1)
 predict3 = np.expand_dims(np.loadtxt('Main model//Predictions//model16.csv', delimiter=','),axis=1)
 predict4 = np.expand_dims(np.loadtxt('Main model//Predictions//model26.csv', delimiter=','),axis=1)
 predict5 = np.expand_dims(np.loadtxt('Main model//Predictions//model28.csv', delimiter=','),axis=1)
-# predict3 = np.expand_dims(np.loadtxt('Predictions//transfer_model.csv', delimiter=','),axis=1)
-# predict4 = np.expand_dims(np.loadtxt('Predictions//4_Model_2+conv(128).csv', delimiter=','),axis=1)
-# predict5 = np.expand_dims(np.loadtxt('Predictions//13_Model_12+lr(0.001).csv', delimiter=','),axis=1)
-# predict98 = np.expand_dims(np.loadtxt('Predictions//Model31.csv', delimiter=','),axis=1)
-
 
 train_pred = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=1)
 
@@ -104,7 +93,7 @@ train_pred = np.concatenate((predict1,predict2,predict3,predict4,predict5),axis=
 # modelname = 'Main model\\models\Combination_mod\\SVC_poly=5.sav'
 # pickle.dump(SVM_model, open(modelname,'wb'))
 
-SVM_model = svm.SVC(kernel='poly', degree=5, C=0.0001, verbose=1, gamma='scale', max_iter=100000, probability=True)
+SVM_model = svm.SVC(kernel='rbf', C=0.001, verbose=1, gamma='scale', max_iter=100000, probability=True)
 SVM_model.fit(train_pred,true_labels)
-modelname = 'Main model\\models\Combination_mod\\SVC_poly=5_C=00001_maxiter100000.sav'
+modelname = 'Main model\\models\Combination_mod\\SVC_rbf_C=0.00001.sav'
 pickle.dump(SVM_model, open(modelname,'wb'))
