@@ -15,18 +15,20 @@ import os
 from keras.models import model_from_json
 import pickle
 
-
+#Load test data filepath
 TEST_PATH = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\test\test"
+#Load in individual model filepaths
 MODEL_FILEPATH1 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\Model13_1.json"
 MODEL_FILEPATH2 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\model16.json"
 MODEL_FILEPATH3 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\Model26.json"
 MODEL_FILEPATH4 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\model_28.json"
 MODEL_FILEPATH5 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\model21.json"
 
-
+#Load in ensemble model filepaths
 combi_model_filepath = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Combination_mod\RFc_d=5.sav"
 combi_model_filepath_2 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Combination_mod\SVC_lin_C=0.001.sav"
 
+#Load in filepaths of weights for the individual models
 MODEL_WEIGHTS_FILEPATH1 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\Model13_1_weights.hdf5"
 MODEL_WEIGHTS_FILEPATH2 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\model16_weights.hdf5"
 MODEL_WEIGHTS_FILEPATH3 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Project\8P361-groep-4\Main model\models\Prediction_mod\Model26_weights.hdf5"
@@ -36,6 +38,7 @@ MODEL_WEIGHTS_FILEPATH5 = r"C:\Users\20174099\Documents\School\Jaar 3\Imaging Pr
 
 
 # load model and model weights
+
 #json_file = open(MODEL_FILEPATH, 'r')
 #loaded_model_json = json_file.read()
 #json_file.close()
@@ -59,7 +62,7 @@ model4.load_weights(MODEL_WEIGHTS_FILEPATH4)
 model5.load_weights(MODEL_WEIGHTS_FILEPATH5)
 
 
-#Load RandomForest
+#Load RandomForest and or SVC
 rfc = pickle.load(open(combi_model_filepath,'rb'))
 svc = pickle.load(open(combi_model_filepath_2,'rb'))
 # open the test set in batches (as it is a very big dataset) and make predictions
